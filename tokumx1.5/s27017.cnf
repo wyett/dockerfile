@@ -1,0 +1,16 @@
+port=27017
+dbpath=/data/mongodb/shard27017
+pidfilepath=/data/mongodb/shard27017/mongod.pid
+#logpath=/data/mongodb/shard27017/mongod.log
+logappend=true
+nohttpinterface=true
+keyFile=/data/mongodb/shard27017/s27017.key
+expireOplogDays=14
+cacheSize=2G
+syncdelay=5
+#notablescan=true
+profile=1
+slowms=100
+#replSet=RS001
+maxConns=5000
+#fork=true

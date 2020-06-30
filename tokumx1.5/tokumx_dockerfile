@@ -1,0 +1,46 @@
+FROM oraclelinux:6.10
+MAINTAINER wyettlei  <wyettlei@hotmail.com>
+
+# env
+#ENV mongokeyid=`head -c 6 /dev/urandom | od -An -t x | tr -d ' '`
+ENV MONGOKEYID 101123 
+
+RUN \
+  rm -r -f /etc/yum.repos.d/*
+
+COPY ./6ASU9_oracle.repo /etc/yum.repos.d/
+
+# yum
+RUN \
+  yum -y install tar.x86_64 && \
+  mkdir -p /data/mongodb/shard27017
+
+COPY  ./tokumx-1.5.0-linux-x86_64.tgz /opt/ 
+COPY  ./s27017.cnf /data/mongodb/shard27017/
+COPY  ./s27017.key /data/mongodb/shard27017/
+COPY  ./startup.sh /data/mongodb/ 
+
+
+# untar tokumx
+RUN \
+  tar -zxvf /opt/tokumx-1.5.0-linux-x86_64.tgz -C /opt/ && \
+  ln -s /opt/tokumx-1.5.0-linux-x86_64 /opt/tokumx && \
+  chmod 400 /data/mongodb/shard27017/s27017.key && \
+  chmod 755 /data/mongodb/shard27017
+
+
+
+# Define mountable directories.
+VOLUME /data/mongodb/shard27017
+
+# expose port
+EXPOSE 27017 10001
+
+# Define working directory.
+WORKDIR /data/mongodb
+
+# Define default command.
+#CMD ["/opt/tokumx/bin/mongod", "--config", "/data/mongodb/shard27017/s27017.cnf"]
+#CMD sh /data/mongodb/startup.sh $MONGOKEYID
+
+ENTRYPOINT /opt/tokumx/bin/mongod -f /data/mongodb/shard27017/s27017.cnf
